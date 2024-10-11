@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getMetaData } from '../../../tool';
 import AnswerView from './answer';
 import AnswerHeader from './header';
@@ -9,7 +9,7 @@ import VoteComponent from '../voteComponent';
 import { Question, Comment, Answer } from '../../../types';
 import CommentSection from '../commentSection';
 import addComment from '../../../services/commentService';
-import UserContext from '../../../contexts/UserContext';
+import useUserContext from '../../../hooks/useUserContext';
 
 /**
  * Interface representing the props for the AnswerPage component.
@@ -33,12 +33,7 @@ interface AnswerPageProps {
  * @param handleNewAnswer Callback function to handle posting a new answer.
  */
 const AnswerPage = ({ qid, handleNewQuestion, handleNewAnswer }: AnswerPageProps) => {
-  // TODO: Task 1 - Refactor the AnswerPage component to use the useUserContext hook
-  const context = useContext(UserContext);
-  if (context === null) {
-    throw new Error('User context is null.');
-  }
-  const { socket } = context;
+  const { socket } = useUserContext();
   const [question, setQuestion] = useState<Question | null>(null);
 
   const handleNewComment = async (
