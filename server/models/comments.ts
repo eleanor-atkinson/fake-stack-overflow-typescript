@@ -11,4 +11,11 @@ import { Comment } from '../types';
  *
  * @type {Model<Comment>}
  */
-// TODO: Task 2: Create and export `CommentModel`
+interface CommentDocument extends Comment, Document {}
+
+const CommentModel: Model<CommentDocument> = mongoose.model<CommentDocument>(
+  'Comment',
+  commentSchema,
+);
+
+export default CommentModel;

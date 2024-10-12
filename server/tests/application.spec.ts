@@ -19,6 +19,7 @@ import {
 import { Answer, Question, Tag, Comment } from '../types';
 import { T1_DESC, T2_DESC, T3_DESC } from '../data/posts_strings';
 import AnswerModel from '../models/answers';
+import CommentModel from '../models/comments';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
@@ -810,7 +811,42 @@ describe('application module', () => {
         expect(result).toEqual({ error: 'Error when adding comment' });
       });
 
-      // TODO: Task 2 - Add more tests for the addComment function
+      test('addComment should return the updated answer when given `answer`', async () => {
+        const answer = ans1;
+        answer.comments.push(com1);
+        mockingoose(AnswerModel).toReturn(answer, 'findOneAndUpdate');
+
+        const result = (await addComment(
+          answer._id?.toString() as string,
+          'answer',
+          com1,
+        )) as Answer;
+
+        expect(result.comments.length).toEqual(1);
+        expect(result.comments).toContain(com1._id);
+      });
+
+      test('addComment should return an error if comment saving fails', async () => {
+        mockingoose(CommentModel).toReturn(new Error('Error saving comment'), 'create');
+
+        const result = await addComment('507f191e810c19729de860ea', 'question', com1);
+
+        expect(result).toEqual({ error: 'Error when adding comment' });
+      });
+
+      test('addComment should return error if no comment is added to answer', async () => {
+        mockingoose(AnswerModel).toReturn(null, 'findOneAndUpdate');
+
+        const result = await addComment('507f191e810c19729de860ea', 'answer', com1);
+
+        expect(result).toEqual({ error: 'Error when adding comment' });
+      });
+
+      test('addComment should handle errors from invalid id format', async () => {
+        const result = await addComment('invalid_id', 'question', com1);
+
+        expect(result).toEqual({ error: 'Error when adding comment' });
+      });
     });
   });
 });

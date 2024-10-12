@@ -15,8 +15,11 @@ const commentController = (socket: Server) => {
    * @returns `true` if the request is valid, otherwise `false`.
    */
   const isRequestValid = (req: AddCommentRequest): boolean => {
-    // TODO: Task 2 - Implement the `isRequestValid` function
-    throw new Error('Not implemented');
+    const { id, type, comment } = req.body;
+    if (!id || !type || !comment) {
+      return false;
+    }
+    return true;
   };
 
   /**
@@ -26,10 +29,8 @@ const commentController = (socket: Server) => {
    *
    * @returns `true` if the coment is valid, otherwise `false`.
    */
-  const isCommentValid = (comment: Comment): boolean => {
-    // TODO: Task 2 - Implement the `isCommentValid` function
-    throw new Error('Not implemented');
-  };
+  const isCommentValid = (comment: Comment): boolean =>
+    !!(comment.text && comment.commentBy && comment.commentDateTime);
 
   /**
    * Handles adding a new comment to the specified question or answer. The comment is first validated and then saved.
@@ -42,15 +43,47 @@ const commentController = (socket: Server) => {
    * @returns A Promise that resolves to void.
    */
   const addCommentRoute = async (req: AddCommentRequest, res: Response): Promise<void> => {
-    // TODO: Task 2 - Implement the `addCommentRoute` function
-    // Hint: Refer to the addAnswer function in answer.ts for guidance
+    if (!isRequestValid(req)) {
+      res.status(400).send('Invalid request');
+      return;
+    }
 
-    // TODO: Task 3 - Emit the object updated with the comment to all connected clients
-    // Hint: View the database to see how the data is stored and compare with the data expected
-    // What might you need to do with the result from addComment?
+    if (!isCommentValid(req.body.comment)) {
+      res.status(400).send('Invalid comment');
+      return;
+    }
 
-    throw new Error('Not implemented');
+    const { id, type, comment } = req.body;
+
+    try {
+      const savedComment = await saveComment(comment);
+
+      if ('error' in savedComment) {
+        throw new Error(savedComment.error as string);
+      }
+
+      const updatedDocument = await addComment(id, type, savedComment);
+
+      if (updatedDocument && 'error' in updatedDocument) {
+        throw new Error(updatedDocument.error as string);
+      }
+
+      // Populates the fields of the comment that was added and emits the new object
+      socket.emit('commentUpdate', {
+        id,
+        type,
+        updatedDocument: await populateDocument(id, type),
+      });
+
+      res.json(savedComment);
+    } catch (err) {
+      res.status(500).send(`Error when adding comment: ${(err as Error).message}`);
+    }
   };
+
+  // TODO: Task 3 - Emit the object updated with the comment to all connected clients
+  // Hint: View the database to see how the data is stored and compare with the data expected
+  // What might you need to do with the result from addComment?
 
   router.post('/addComment', addCommentRoute);
 

@@ -10,7 +10,20 @@ import { Schema } from 'mongoose';
  * - `commentDateTime`: The date and time when the comment was posted.
  */
 const commentSchema: Schema = new Schema(
-  // TODO: Task 2 - Create Schema for comment
+  {
+    text: {
+      type: String,
+      required: true,
+    },
+    commentBy: {
+      type: String,
+      required: true,
+    },
+    commentDateTime: {
+      type: Date,
+      default: Date.now,
+    },
+  },
   { collection: 'Comment' },
 );
 
