@@ -84,6 +84,7 @@ const useNewQuestion = (handleQuestions: () => void) => {
       upVotes: [],
       downVotes: [],
       views: 0,
+      comments: [],
     };
 
     const res = await addQuestion(question);

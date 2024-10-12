@@ -39,6 +39,7 @@ const useAnswerForm = (qid: string, handleAnswer: (qid: string) => void) => {
       text,
       ansBy: user.username,
       ansDateTime: new Date(),
+      comments: [],
     };
 
     try {

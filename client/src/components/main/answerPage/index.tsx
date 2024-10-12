@@ -41,9 +41,16 @@ const AnswerPage = ({ qid, handleNewQuestion, handleNewAnswer }: AnswerPageProps
     targetType: 'question' | 'answer',
     targetId: string | undefined,
   ) => {
-    // TODO: Task 2 - Implement the handleNewComment function
-    // This function should add a new comment to the question or answer.
-    // It should call the addComment function from the commentService file.
+    if (!targetId) return;
+
+    try {
+      await addComment(targetId, targetType, comment);
+      const updatedQuestion = await getQuestionById(qid);
+      setQuestion(updatedQuestion || null);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error adding comment:', error);
+    }
   };
 
   useEffect(() => {
@@ -96,7 +103,6 @@ const AnswerPage = ({ qid, handleNewQuestion, handleNewAnswer }: AnswerPageProps
     return null;
   }
 
-  // TODO: Task 2 - Use the CommentSection component and modify the AnswerPage component
   return (
     <>
       <VoteComponent question={question} />
@@ -111,12 +117,20 @@ const AnswerPage = ({ qid, handleNewQuestion, handleNewAnswer }: AnswerPageProps
         askby={question.askedBy}
         meta={getMetaData(new Date(question.askDateTime))}
       />
+      <CommentSection
+        comments={question.comments}
+        handleAddComment={(newComment: Comment) =>
+          handleNewComment(newComment, 'question', question._id)
+        }
+      />
       {question.answers.map((a, idx) => (
         <AnswerView
           key={idx}
           text={a.text}
           ansBy={a.ansBy}
           meta={getMetaData(new Date(a.ansDateTime))}
+          comments={a.comments}
+          handleAddComment={(newComment: Comment) => handleNewComment(newComment, 'answer', a._id)}
         />
       ))}
       <button
