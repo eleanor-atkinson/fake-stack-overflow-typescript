@@ -22,21 +22,13 @@ interface CommentSectionProps {
  * @param handleAddComment: function to handle the addition of a new comment
  */
 const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => {
-  // TODO: Task 2 - Implement the CommentSection component
-
-  // Add the necessary state variables and functions to handle the comment input and display
-  // Hint: you can get the current user from the useUserContext hook
-
-  // Add the necessary handlers to show/hide comments and add new comments
   const { user } = useUserContext();
   const [showComments, setShowComments] = useState<boolean>(false);
   const [newComment, setNewComment] = useState<string>('');
   const [error, setError] = useState<string>('');
 
-  // Toggle the visibility of the comments
   const toggleComments = () => setShowComments(!showComments);
 
-  // Handle adding a new comment
   const onAddComment = () => {
     if (!newComment.trim()) {
       setError('Comment cannot be empty');
@@ -74,13 +66,9 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
    *  - If the comment text is empty, display an error message saying "Comment cannot be empty."
    *  - When a comment is added, clear the text area.
    */
-  // <div className='comment-section'></div>
   return (
     <div className='comment-section'>
-      {/* Toggle Comments Button */}
       <button onClick={toggleComments}>{showComments ? 'Hide Comments' : 'Show Comments'}</button>
-
-      {/* Display Comments */}
       {showComments && (
         <div className='comments-list'>
           {comments.length === 0 ? (
@@ -90,15 +78,14 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
               <div key={index} className='comment'>
                 <p>{comment.text}</p>
                 <p className='comment-meta'>
-                  <span>{comment.commentBy}</span> | {getMetaData(comment.commentDateTime)}
+                  <span>{comment.commentBy}</span> {''}
+                  {getMetaData(new Date(comment.commentDateTime))}
                 </p>
               </div>
             ))
           )}
         </div>
       )}
-
-      {/* Add New Comment */}
       <div className='add-comment'>
         <textarea
           value={newComment}

@@ -85,17 +85,44 @@ const AnswerPage = ({ qid, handleNewQuestion, handleNewAnswer }: AnswerPageProps
       result: Question | Answer;
       type: 'question' | 'answer';
     }) => {
-      // TODO: Task 3 - Complete function to handle comment updates from the socket
+      if (!result || !result.comments) {
+        // eslint-disable-next-line no-console
+        console.error('Invalid result or missing comments:', result);
+        return;
+      }
+      if (type === 'question') {
+        setQuestion(prevQuestion =>
+          prevQuestion
+            ? { ...prevQuestion, comments: (result as Question).comments || [] }
+            : prevQuestion,
+        );
+      } else if (type === 'answer') {
+        setQuestion(prevQuestion =>
+          prevQuestion
+            ? {
+                ...prevQuestion,
+                answers: prevQuestion.answers.map(a =>
+                  a._id === (result as Answer)._id
+                    ? {
+                        ...a,
+                        comments: (result as Answer).comments || [],
+                      }
+                    : a,
+                ),
+              }
+            : prevQuestion,
+        );
+      }
     };
 
     socket.on('answerUpdate', handleAnswerUpdate);
     socket.on('viewsUpdate', setQuestion);
-
-    // TODO: Task 3 - Setup appropriate socket listener(s) for comment updates
+    socket.on('commentUpdate', handleCommentUpdate);
 
     return () => {
       socket.off('answerUpdate', handleAnswerUpdate);
       socket.off('viewsUpdate', setQuestion);
+      socket.off('commentUpdate', handleCommentUpdate);
     };
   }, [socket]);
 

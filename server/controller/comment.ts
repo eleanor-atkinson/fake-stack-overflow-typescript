@@ -1,5 +1,4 @@
 import express, { Response } from 'express';
-import { ObjectId } from 'mongodb';
 import { Server } from 'socket.io';
 import { Comment, AddCommentRequest } from '../types';
 import { addComment, populateDocument, saveComment } from '../models/application';
@@ -68,22 +67,17 @@ const commentController = (socket: Server) => {
         throw new Error(updatedDocument.error as string);
       }
 
-      // Populates the fields of the comment that was added and emits the new object
-      socket.emit('commentUpdate', {
-        id,
-        type,
-        updatedDocument: await populateDocument(id, type),
-      });
+      const populatedDocument = await populateDocument(id, type);
 
+      socket.emit('commentUpdate', {
+        result: populatedDocument,
+        type,
+      });
       res.json(savedComment);
     } catch (err) {
       res.status(500).send(`Error when adding comment: ${(err as Error).message}`);
     }
   };
-
-  // TODO: Task 3 - Emit the object updated with the comment to all connected clients
-  // Hint: View the database to see how the data is stored and compare with the data expected
-  // What might you need to do with the result from addComment?
 
   router.post('/addComment', addCommentRoute);
 

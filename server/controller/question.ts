@@ -177,7 +177,12 @@ const questionController = (socket: Server) => {
         throw new Error(status.error as string);
       }
 
-      // TODO: Task 3 - Emit the updated vote counts to all connected clients
+      socket.emit('voteUpdate', {
+        qid,
+        upVotes: status.upVotes,
+        downVotes: status.downVotes,
+      });
+
       res.json({ msg: status.msg, upVotes: status.upVotes, downVotes: status.downVotes });
     } catch (err) {
       res.status(500).send(`Error when ${type}ing: ${(err as Error).message}`);

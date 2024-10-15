@@ -160,5 +160,4 @@ export interface AddCommentRequest extends Request {
 /**
  * Type representing the possible responses for a Comment-related operation.
  */
-// TODO: Task 2 - Create the `CommentResponse` type
 export type CommentResponse = Comment | { error: string };

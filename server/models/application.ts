@@ -510,7 +510,6 @@ export const addVoteToQuestion = async (
     const result = await QuestionModel.findOneAndUpdate({ _id: qid }, updateOperation, {
       new: true,
     });
-
     if (!result) {
       return { error: 'Question not found!' };
     }
@@ -587,7 +586,7 @@ export const addComment = async (
     const savedComment = await saveComment(comment);
 
     if ('error' in savedComment) {
-      return savedComment; // Return if there's an error in saving the comment
+      return savedComment;
     }
 
     let result = null;

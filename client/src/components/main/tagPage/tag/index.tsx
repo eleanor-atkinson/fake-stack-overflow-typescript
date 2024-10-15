@@ -1,7 +1,6 @@
 import React from 'react';
 import './index.css';
-import { Tag, TagData } from '../../../../types';
-import { getTagByName } from '../../../../services/tagService';
+import { TagData } from '../../../../types';
 import useTagSelected from '../../../../hooks/useTagSelected';
 
 /**

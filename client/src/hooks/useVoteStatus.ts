@@ -24,16 +24,28 @@ const useVoteStatus = (question: Question) => {
       return 0;
     };
 
-    // Set the initial count and vote value
     setCount((question.upVotes || []).length - (question.downVotes || []).length);
     setVoted(getVoteValue());
 
     const handleVoteUpdate = (voteData: VoteData) => {
-      // TODO: Task 3 - Complete function to handle vote updates from the socket
+      if (voteData.qid === question._id) {
+        setCount(voteData.upVotes.length - voteData.downVotes.length);
+        if (voteData.upVotes.includes(user.username)) {
+          setVoted(1);
+        } else if (voteData.downVotes.includes(user.username)) {
+          setVoted(-1);
+        } else {
+          setVoted(0);
+        }
+      }
     };
 
-    // TODO: Task 3 - Setup appropriate socket listener(s) for vote updates
-  }, [question, user.username]);
+    socket.on('voteUpdate', handleVoteUpdate);
+
+    return () => {
+      socket.off('voteUpdate', handleVoteUpdate);
+    };
+  }, [question, user.username, socket]);
 
   const handleVote = async (type: string) => {
     try {
